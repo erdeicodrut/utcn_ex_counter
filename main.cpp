@@ -1,9 +1,8 @@
 #include <iostream>
 #include <fstream>
-#include <string>
+#include <utility>
 #include <vector>
-#include <algorithm> 
-#include <cstdlib>
+#include <algorithm>
 #include <ctime>
 
 using namespace std;
@@ -15,16 +14,10 @@ struct Prob {
 	string answ;
 	bool done;
 
-	Prob(int n, string a, bool t) {
-		num = n;
-		answ = a;
-		done = t;
-	}
+	Prob(int n, string a, bool t) : num(n), answ(std::move(a)), done(t) {}
 };
 
-bool lt(Prob x, Prob y) { return x.num < y.num; }
-
-void init(vector<Prob>& probs) {
+void init(vector<Prob> &probs) {
 	ifstream data(fisierText);
 
 	while (!data.eof()) {
@@ -35,7 +28,7 @@ void init(vector<Prob>& probs) {
 
 		data >> nr >> r >> d;
 
-		if (d == 1) done = true; else done = false;
+		done = d == 1;
 
 		Prob p = Prob(nr, r, done);
 
@@ -46,7 +39,7 @@ void init(vector<Prob>& probs) {
 	data.close();
 }
 
-void out(vector<Prob>& probs, int prob) {
+void out(vector<Prob> &probs, int prob) {
 	ofstream g(fisierText);
 	for (Prob p : probs) {
 		if (p.num == prob)
@@ -58,16 +51,16 @@ void out(vector<Prob>& probs, int prob) {
 
 
 int main(int argc, char *argv[]) {
-	
+
 	vector<Prob> probs;
 
 	init(probs);
 
 	if (argc == 1) {
-		srand(time(NULL));
+		srand(time(nullptr));
 		while (true) {
 			int p = rand() % probs.size();
-			if (probs[p].done != true) {
+			if (!probs[p].done) {
 				cout << probs[p].num << '\n';
 				return 0;
 			}
@@ -81,16 +74,16 @@ int main(int argc, char *argv[]) {
 	first_arge = argv[1];
 	all_args.assign(argv + 1, argv + argc);
 
-		
+
 	int nrProb;
 	nrProb = atoi(all_args[0].c_str());
 
 	string rasp = all_args[1];
 
-	for (Prob& p : probs) {
-		if (p.num != nrProb) continue; 
+	for (Prob &p : probs) {
+		if (p.num != nrProb) continue;
 
-		if (p.answ.compare(rasp) == 0) {
+		if (p.answ == rasp) {
 			cout << "Bravo!\n";
 			p.done = true;
 			out(probs, p.num);
@@ -99,8 +92,6 @@ int main(int argc, char *argv[]) {
 			cout << "Mai incearca\n";
 		}
 	}
-
-
 
 
 	return 0;
